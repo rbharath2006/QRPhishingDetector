@@ -1,0 +1,88 @@
+name: qr-browser-sandbox
+services:
+  egress-proxy:
+    build:
+      context: ./proxy
+    container_name: qr-sandbox-egress-proxy
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 80
+    mem_limit: 256m
+    cpus: 0.50
+    networks:
+      - sandbox_internal
+      - sandbox_egress
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.create_connection(('127.0.0.1',3128),2); s.close()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  browser-worker:
+    build:
+      context: ./worker
+    container_name: qr-sandbox-browser-worker
+    restart: unless-stopped
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+    # Deliberately not published to the Windows host. The worker stays only
+    # on sandbox_internal; host access is provided by the fixed-path gateway.
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,exec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 160
+    mem_limit: 2g
+    cpus: 2.0
+    shm_size: 512m
+    init: true
+    networks:
+      - sandbox_internal
+
+  api-gateway:
+    build:
+      context: ./gateway
+    container_name: qr-sandbox-api-gateway
+    restart: unless-stopped
+    depends_on:
+      browser-worker:
+        condition: service_started
+    ports:
+      - "127.0.0.1:8765:8765"
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 0.50
+    networks:
+      - sandbox_internal
+      - sandbox_frontdoor
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/health', timeout=2).read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+networks:
+  sandbox_internal:
+    internal: true
+    driver: bridge
+  sandbox_egress:
+    driver: bridge
+  sandbox_frontdoor:
+    driver: bridge

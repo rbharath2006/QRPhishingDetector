@@ -1,0 +1,2 @@
+# Sandbox endpoint is disabled unless explicitly enabled for local demonstration.
+app.sandbox.enabled=${SANDBOX_ENABLED:false}
