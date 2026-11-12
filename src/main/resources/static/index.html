@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Phishing Detector — Cyber Defense Console</title>
+  <meta name="description" content="Interactive 3D QR phishing detection and awareness dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="bootScreen" class="boot-screen">
+    <div class="boot-core"></div>
+    <div class="boot-text">
+      <span>INITIALIZING SECURITY CORE...</span>
+      <span>LOADING THREAT INTELLIGENCE...</span>
+      <span>ESTABLISHING SECURE MODE...</span>
+    </div>
+  </div>
+
+  <canvas id="spaceCanvas"></canvas>
+  <div class="scanlines"></div>
+  <div class="cursor-glow"></div>
+
+  <header class="topbar glass">
+    <a class="brand" href="#dashboard">
+      <div class="brand-mark">
+        <span class="shield">⌬</span>
+        <span class="brand-dot"></span>
+      </div>
+      <div>
+        <h1>QR PHISHING <span>DETECTOR</span></h1>
+        <p>SCAN • ANALYZE • DETECT • PROTECT</p>
+      </div>
+    </a>
+
+    <div class="secure-status">
+      <i></i>
+      <span>[ SECURE MODE : <b>ONLINE</b> ]</span>
+    </div>
+
+    <nav>
+      <a href="#dashboard">Console</a>
+      <a href="#how">How it works</a>
+      <a href="#awareness">Awareness</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="dashboard" class="hero-section">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">[ CYBER DEFENSE / QR SECURITY ]</p>
+        <h2>Don't scan.<br><span>Know first.</span></h2>
+        <p class="hero-desc">
+          Inspect suspicious QR destinations before they get a chance to steal
+          credentials, money, or your identity.
+        </p>
+        <a href="#console" class="cyber-button primary">ENTER SECURITY CONSOLE <span>↘</span></a>
+      </div>
+
+      <div class="orbital-scene" aria-hidden="true">
+        <div class="orbit orbit-a"></div>
+        <div class="orbit orbit-b"></div>
+        <div class="orbit orbit-c"></div>
+        <div class="cyber-orb">
+          <div class="orb-grid"></div>
+          <div class="orb-core">QR</div>
+          <div class="orb-ring ring-1"></div>
+          <div class="orb-ring ring-2"></div>
+          <div class="orb-ring ring-3"></div>
+        </div>
+        <div class="floating-node node-a">URL</div>
+        <div class="floating-node node-b">QR</div>
+        <div class="floating-node node-c">AI</div>
+      </div>
+    </section>
+
+    <section id="console" class="console-wrap">
+      <div class="console-head reveal">
+        <div>
+          <p class="eyebrow">[ THREAT ANALYSIS TERMINAL ]</p>
+          <h2>Security Console</h2>
+        </div>
+        <div class="live-pill"><i></i> LIVE ANALYSIS</div>
+      </div>
+
+      <div class="dashboard-grid">
+        <section class="panel target-panel tilt reveal">
+          <div class="panel-title"><span>&gt;</span> TARGET INPUT</div>
+
+          <div class="tabs">
+            <button class="tab active" data-mode="url">[ URL ]</button>
+            <button class="tab" data-mode="qr">[ QR IMAGE ]</button>
+          </div>
+
+          <div id="urlInputArea">
+            <label for="targetUrl">TARGET URL:</label>
+            <input id="targetUrl" type="url" placeholder="https://example.com" autocomplete="off" />
+          </div>
+
+          <div id="qrInputArea" class="hidden">
+            <label>QR IMAGE:</label>
+            <label class="dropzone" id="dropzone" for="qrFile">
+              <div class="qr-icon">▦</div>
+              <strong>UPLOAD QR CODE</strong>
+              <span>Drag & drop image here</span>
+              <small>PNG • JPG • JPEG • WEBP</small>
+              <input id="qrFile" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+            </label>
+            <div id="fileName" class="file-name">No image selected</div>
+
+            <div class="camera-actions">
+              <button type="button" id="startCameraBtn" class="cyber-button camera-action">
+                START CAMERA <span>◉</span>
+              </button>
+              <button type="button" id="stopCameraBtn" class="cyber-button camera-action camera-stop" disabled>
+                STOP CAMERA <span>■</span>
+              </button>
+            </div>
+
+            <div id="cameraPanel" class="camera-panel hidden">
+              <div class="camera-frame">
+                <video id="cameraVideo" autoplay playsinline muted></video>
+                <div class="camera-reticle" aria-hidden="true"></div>
+              </div>
+              <p id="cameraStatus" role="status">Camera is inactive.</p>
+            </div>
+            <p class="camera-help">Camera permission is required. Use localhost or HTTPS. QR content is decoded locally; the destination is never opened automatically.</p>
+          </div>
+
+          <button id="analyzeBtn" class="cyber-button analyze">ANALYZE TARGET <span>↗</span></button>
+
+          <div class="quick-examples">
+            <span>TEST:</span>
+            <button data-url="https://www.google.com">SAFE</button>
+            <button data-url="http://paypa1-login-security.example">HIGH RISK</button>
+            <button data-url="https://bit.ly/verify-account">SHORT URL</button>
+          </div>
+        </section>
+
+        <section class="panel threat-panel tilt reveal">
+          <div class="panel-title"><span>&gt;</span> THREAT ANALYSIS</div>
+
+          <div id="statusBox" class="status-box">
+            <div class="status-line"><span>&gt;</span> STATUS: <strong id="statusText">WAITING</strong></div>
+            <p id="statusMessage">Enter a URL or upload a QR image.</p>
+          </div>
+
+          <div class="risk-block">
+            <div class="risk-label">
+              <span>&gt; RISK SCORE:</span>
+              <strong id="riskScore">0/100</strong>
+            </div>
+            <div class="meter"><div id="riskBar"></div></div>
+            <div class="risk-scale"><span>SAFE</span><span>CAUTION</span><span>CRITICAL</span></div>
+          </div>
+
+          <div class="verdict" id="verdictBox">
+            <span class="verdict-icon">◈</span>
+            <div>
+              <b>READY</b>
+              <small>Run an analysis to inspect the target.</small>
+            </div>
+          </div>
+
+          <button id="openUrlBtn" class="cyber-button open-url" disabled>
+            OPEN TESTED URL <span>↗</span>
+          </button>
+          <div id="openUrlNote" class="open-url-note">
+            The button becomes available after a successful scan.
+          </div>
+        </section>
+
+        <section class="panel history-panel reveal">
+          <div class="panel-title"><span>&gt;</span> SCAN HISTORY <button id="clearHistory">[ CLEAR ]</button></div>
+          <div id="historyList" class="history-list">
+            <div class="empty-history">
+              <div>▤</div>
+              <p>No previous scans</p>
+              <small>Results will appear here.</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel details-panel reveal">
+          <div class="panel-title"><span>&gt;</span> ANALYSIS DETAILS</div>
+          <div id="analysisDetails" class="details-empty">No analysis performed yet.</div>
+        </section>
+      </div>
+    </section>
+
+    <section id="how" class="info-section">
+      <div class="section-heading reveal">
+        <p class="eyebrow">[ SYSTEM ARCHITECTURE ]</p>
+        <h2>How the detector thinks</h2>
+        <p>Three layers. One goal: make the destination visible before you trust it.</p>
+      </div>
+
+      <div class="steps">
+        <article class="step-card tilt reveal">
+          <span class="step-num">01</span>
+          <div class="step-icon">◉</div>
+          <h3>INPUT</h3>
+          <p>Paste a URL or upload a QR image. The QR payload can be decoded before any destination is opened.</p>
+        </article>
+        <article class="step-card tilt reveal">
+          <span class="step-num">02</span>
+          <div class="step-icon">⌁</div>
+          <h3>ANALYZE</h3>
+          <p>Inspect domain structure, HTTPS, redirects, suspicious words, URL obfuscation and common phishing signals.</p>
+        </article>
+        <article class="step-card tilt reveal">
+          <span class="step-num">03</span>
+          <div class="step-icon">◆</div>
+          <h3>PROTECT</h3>
+          <p>Turn the score into a clear verdict so the user knows whether to proceed, investigate, or stop.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="awareness" class="awareness-section">
+      <div class="section-heading reveal">
+        <p class="eyebrow">[ HUMAN FIREWALL / AWARENESS MODE ]</p>
+        <h2>Phishing doesn't always look dangerous.</h2>
+        <p>QR phishing — sometimes called <b>quishing</b> — hides malicious destinations behind something that looks harmless.</p>
+      </div>
+
+      <div class="awareness-grid">
+        <article class="warning-card critical reveal">
+          <div class="warning-top"><span>01</span><b>FAKE LOGIN PAGES</b></div>
+          <p>A QR code can send you to a cloned banking, email, payment or social-media login page.</p>
+          <div class="tip">DEFENSE → Check the domain before entering credentials.</div>
+        </article>
+
+        <article class="warning-card reveal">
+          <div class="warning-top"><span>02</span><b>PAYMENT TRAPS</b></div>
+          <p>Attackers may replace legitimate QR stickers with their own to redirect payments.</p>
+          <div class="tip">DEFENSE → Verify the recipient and amount inside your payment app.</div>
+        </article>
+
+        <article class="warning-card reveal">
+          <div class="warning-top"><span>03</span><b>SHORTENED LINKS</b></div>
+          <p>Short URLs hide the final destination and make it harder to recognize a malicious domain.</p>
+          <div class="tip">DEFENSE → Expand or inspect shortened links before trusting them.</div>
+        </article>
+
+        <article class="warning-card reveal">
+          <div class="warning-top"><span>04</span><b>URGENCY & FEAR</b></div>
+          <p>Messages such as “account blocked” or “verify in 5 minutes” are designed to rush your judgment.</p>
+          <div class="tip">DEFENSE → Pause. Verify using the organization's official app or website.</div>
+        </article>
+      </div>
+
+      <div class="rules-panel reveal">
+        <div class="rules-header">
+          <span class="pulse-dot"></span>
+          <h3>THE 7-SECOND PHISHING CHECK</h3>
+        </div>
+        <div class="rules-grid">
+          <div><b>01</b><span>Stop before scanning unknown codes.</span></div>
+          <div><b>02</b><span>Read the complete domain carefully.</span></div>
+          <div><b>03</b><span>Watch for misspellings and lookalike domains.</span></div>
+          <div><b>04</b><span>Be suspicious of unexpected urgency.</span></div>
+          <div><b>05</b><span>Never share OTPs or passwords through a QR prompt.</span></div>
+          <div><b>06</b><span>Verify payments and recipients independently.</span></div>
+          <div><b>07</b><span>If something feels wrong, close it.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta reveal">
+      <div class="cta-grid"></div>
+      <p class="eyebrow">[ FINAL PROTOCOL ]</p>
+      <h2>SCAN SMART.<br><span>STAY PHISH-PROOF.</span></h2>
+      <p>Technology can flag signals. Your attention is still the strongest security layer.</p>
+      <a href="#console" class="cyber-button primary">RUN ANOTHER CHECK ↑</a>
+    </section>
+  </main>
+
+  <footer>
+    <span>QR PHISHING DETECTOR // SECURITY CONSOLE</span>
+    <span>BUILT FOR AWARENESS • DEFENSE • EDUCATION</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="script.js"></script>
+  <script src="/sandbox-ui.js" defer></script>
+  <script src="/unified-report-ui.js"></script>
+</body>
+</html>
