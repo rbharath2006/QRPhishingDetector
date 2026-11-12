@@ -1,0 +1,58 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+application-local.properties
+application-prod.properties
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Java / Maven
+target/
+**/target/
+*.class
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Logs and runtime databases
+*.log
+*.sqlite
+*.sqlite3
+*.db
+*.mv.db
+
+# Build and operating system files
+build/
+.gradle/
+.DS_Store
+Thumbs.db
+# Local IntelliJ run configurations
+.run/
+
+# Backup files
+*.bak
+
+# IntelliJ local run configurations
+.run/
+
+# Local threat feed dataset; verify redistribution rights before publishing
+/dev-data/local-phishing-urls.txt
